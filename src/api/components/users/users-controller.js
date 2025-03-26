@@ -191,6 +191,33 @@ async function deleteUser(request, response, next) {
   }
 }
 
+async function loginUser(request, response, next) {
+  try {
+    const { email, password } = request.body;
+
+    // Cek apakah email dan password ada di dalam body request
+    if (!email || !password) {
+      throw errorResponder(errorTypes.VALIDATION_ERROR, 'Email and password are required');
+    }
+
+    // Panggil service untuk memeriksa apakah email dan password valid
+    const user = await usersService.loginUser(email, password);
+
+    // Jika login berhasil, kirimkan response dengan data user
+    return response.status(200).json({
+      message: 'Login successful',
+      user: {
+        email: user.email,
+        full_name: user.full_name,
+      },
+    });
+
+  } catch (error) {
+    // Tangani error dan kirimkan response error
+    return next(error);
+  }
+}
+
 module.exports = {
   getUsers,
   getUser,
@@ -198,4 +225,5 @@ module.exports = {
   updateUser,
   changePassword,
   deleteUser,
+  loginUser,
 };

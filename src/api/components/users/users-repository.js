@@ -1,4 +1,22 @@
 const { Users } = require('../../../models');
+const { hashPassword } = require('../../../utils/password');
+
+async function loginUser(email, password) {
+  // Cari user berdasarkan email
+  const user = await getUserByEmail(email);
+  if (!user) {
+    throw new Error('Invalid email or password');
+  }
+
+  // Cek apakah password cocok
+  hashPassword(password, user.password);
+  if (!passwordMatched(password, user.password)) {
+    throw new Error('Invalid email or password');
+  }
+
+  // Jika valid, kembalikan user
+  return user;
+}
 
 async function getUsers() {
   return Users.find({});
@@ -36,4 +54,5 @@ module.exports = {
   updateUser,
   changePassword,
   deleteUser,
+  loginUser
 };
